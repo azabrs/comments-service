@@ -8,23 +8,21 @@ import (
 	"comments_service/graph/model"
 	"context"
 	"fmt"
+	"log"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
-}
-
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// Register is the resolver for the Register field.
+func (r *mutationResolver) Register(ctx context.Context, registerData model.RegisterData) (*model.RegisterStatus, error) {
+	token, err := r.uc.Register(ctx, registerData)
+	if err != nil{
+		log.Println(err)
+		buf := fmt.Sprint(err)
+		return &model.RegisterStatus{Iserror: true, Description: &buf,  Token: nil}, err
+	}
+	return &model.RegisterStatus{Iserror: false, Description: nil,  Token: &token}, nil
 }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
 type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

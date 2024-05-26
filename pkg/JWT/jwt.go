@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -10,10 +9,10 @@ type Claims struct{
 	jwt.RegisteredClaims
 }
 
-func CreateToken(signingKey string, expiresAt time.Time) (string, error){
+func CreateToken(signingKey string) (string, error){
 	claims := Claims{
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			//ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
 	}
 	Token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
