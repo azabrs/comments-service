@@ -7,7 +7,6 @@ import (
 	"comments_service/internal/storage"
 	"context"
 
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UseCase struct{
@@ -20,15 +19,12 @@ func New(stor storage.Storage, auth authorization.Authorization) UseCase{
 }
 
 func (u UseCase)Register(ctx context.Context, registerData model.RegisterData) (string, error){
-	token, err := u.auth.Authorize()
+	token, err := u.auth.Authorize(registerData.Login)
 	if err != nil{
 		return "", err
 	}
-	tokenHash, err := bcrypt.GenerateFromPassword([]byte(token), bcrypt.MinCost)
-	if err != nil {
-		return "", err
-	}
-	err = u.stor.Register(registerData.Login, string(tokenHash))
+
+	err = u.stor.Register(registerData.Login)
 	if err != nil {
 		return "", err
 	}

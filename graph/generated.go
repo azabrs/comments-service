@@ -2404,7 +2404,7 @@ func (ec *executionContext) unmarshalInputRegisterData(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"login", "passord"}
+	fieldsInOrder := [...]string{"login"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2418,13 +2418,6 @@ func (ec *executionContext) unmarshalInputRegisterData(ctx context.Context, obj 
 				return it, err
 			}
 			it.Login = data
-		case "passord":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("passord"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Passord = data
 		}
 	}
 

@@ -22,9 +22,9 @@ func InitDb(c config.PostgresConfig) (Postgres, error){
 	return Postgres{Db: db}, nil
 }
 
-func (pg *Postgres) Register(login, hashToken string) error{
-	query := `INSERT INTO users(login, token_hash) VALUES($1, $2)`
-	_, err := pg.Db.Exec(query, login, hashToken)
+func (pg *Postgres) Register(login string) error{
+	query := `INSERT INTO users(login) VALUES($1)`
+	_, err := pg.Db.Exec(query, login)
 	if err != nil{
 		return custom_errors.ErrAlreadyRegistered
 	}

@@ -12,8 +12,8 @@ func NewAuthorization(JWTKey string) Authorization{
 }
 
 
-func (auth Authorization) Authorize() (string, error){
-	token, err := jwt.CreateToken(auth.JWTKey)
+func (auth Authorization) Authorize(login string) (string, error){
+	token, err := jwt.CreateToken(auth.JWTKey, login)
 	if err != nil{
 		return "", err
 	}

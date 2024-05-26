@@ -1,5 +1,4 @@
 CREATE TABLE IF NOT EXISTS users(
-    id BIGINT PRIMARY KEY,
-    login TEXT UNIQUE,
-    token_hash TEXT NOT NULL
+    id serial PRIMARY KEY,
+    login TEXT UNIQUE
 );

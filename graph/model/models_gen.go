@@ -9,8 +9,7 @@ type Query struct {
 }
 
 type RegisterData struct {
-	Login   string `json:"login"`
-	Passord string `json:"passord"`
+	Login string `json:"login"`
 }
 
 type RegisterStatus struct {
