@@ -1,0 +1,10 @@
+Server:
+  Host: "0.0.0.0"
+  Port: "8080"
+Postgres:
+  dbName: "commentsdb"
+  user: "apuha"
+  password: "12345678"
+  port: "5432"
+JWT:
+  JWTKey: "secretkey"

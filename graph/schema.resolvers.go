@@ -13,7 +13,7 @@ import (
 
 // Register is the resolver for the Register field.
 func (r *mutationResolver) Register(ctx context.Context, registerData model.RegisterData) (*model.RegisterStatus, error) {
-	token, err := r.uc.Register(ctx, registerData)
+	token, err := r.Uc.Register(ctx, registerData)
 	if err != nil{
 		log.Println(err)
 		buf := fmt.Sprint(err)

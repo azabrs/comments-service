@@ -1,11 +1,11 @@
 package graph
 
-import commentusercase "comments_service/internal/commentUserCase"
+import commentusecase "comments_service/internal/commentUseCase"
 
 // This file will not be regenerated automatically.
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct{
-	uc commentusercase.UserCase
+	Uc commentusecase.UseCase
 }

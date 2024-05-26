@@ -1,4 +1,4 @@
-package commentusercase
+package commentusecase
 
 import (
 	"comments_service/graph/model"
@@ -10,12 +10,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserCase struct{
+type UseCase struct{
 	stor storage.Storage
 	auth authorization.Authorization
 }
+func New(stor storage.Storage, auth authorization.Authorization) UseCase{
+	return UseCase{stor : stor,
+						 auth : auth}
+}
 
-func (u UserCase)Register(ctx context.Context, registerData model.RegisterData) (string, error){
+func (u UseCase)Register(ctx context.Context, registerData model.RegisterData) (string, error){
 	token, err := u.auth.Authorize()
 	if err != nil{
 		return "", err
