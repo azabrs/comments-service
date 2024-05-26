@@ -7,7 +7,6 @@ package graph
 import (
 	"comments_service/graph/model"
 	"context"
-	"fmt"
 	"log"
 )
 
@@ -16,10 +15,18 @@ func (r *mutationResolver) Register(ctx context.Context, registerData model.Regi
 	token, err := r.Uc.Register(ctx, registerData)
 	if err != nil {
 		log.Println(err)
-		buf := fmt.Sprint(err)
-		return &model.RegisterStatus{Iserror: true, Description: &buf, Token: nil}, err
+		return nil, err
 	}
-	return &model.RegisterStatus{Iserror: false, Description: nil, Token: &token}, nil
+	return &model.RegisterStatus{Token: &token}, nil
+}
+
+// CreatePost is the resolver for the CreatePost field.
+func (r *mutationResolver) CreatePost(ctx context.Context, identificationData model.IdentificationData, postData string, isCommentEnbale *bool) (*model.CreateStatus, error) {
+	if err := r.Uc.CreatePost(ctx, identificationData, postData, isCommentEnbale); err != nil {
+		return nil, err
+	}
+	resp := "Successfully published"
+	return &model.CreateStatus{Result: &resp}, nil
 }
 
 // Mutation returns MutationResolver implementation.

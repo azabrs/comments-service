@@ -8,7 +8,6 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.18.2
 	github.com/vektah/gqlparser/v2 v2.5.12
-	golang.org/x/crypto v0.23.0
 )
 
 require (

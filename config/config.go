@@ -6,11 +6,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+
 type Config struct{
 	Server ServerConfig
 	Postgres PostgresConfig
 	JWTKey string
 }
+
 
 type ServerConfig struct{
 	Host string

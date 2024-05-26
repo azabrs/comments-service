@@ -1,7 +1,9 @@
 package storage
 
+import "comments_service/internal/models"
+
 type Storage interface{
 	Register(string) error
-	IsRegister(string) (bool, error)
-	//ToDo
+	CreatePost(models.Post) error
+	IsLoginExist(string) error
 }

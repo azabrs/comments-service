@@ -2,6 +2,15 @@
 
 package model
 
+type CreateStatus struct {
+	Result *string `json:"result,omitempty"`
+}
+
+type IdentificationData struct {
+	Login string `json:"login"`
+	Token string `json:"token"`
+}
+
 type Mutation struct {
 }
 
@@ -13,7 +22,5 @@ type RegisterData struct {
 }
 
 type RegisterStatus struct {
-	Iserror     bool    `json:"iserror"`
-	Description *string `json:"description,omitempty"`
-	Token       *string `json:"token,omitempty"`
+	Token *string `json:"token,omitempty"`
 }

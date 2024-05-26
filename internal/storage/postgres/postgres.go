@@ -3,6 +3,7 @@ package postgres
 import (
 	"comments_service/config"
 	custom_errors "comments_service/errors"
+	"comments_service/internal/models"
 	"database/sql"
 	"fmt"
 
@@ -33,7 +34,21 @@ func (pg *Postgres) Register(login string) error{
 	return nil
 }
 
+func (pg *Postgres)CreatePost(post models.Post) error{
+	query := `INSERT INTO posts(author, time_add, is_comment_enable, subject) VALUES($1, $2, $3, $4)`
+	_, err := pg.Db.Exec(query, post.Author, post.TimeAdd, post.IsCommentEnable, post.Subject)
+	if err != nil{
+		return err
+	}
+	return nil
+}
 
-func (pg *Postgres) IsRegister(string) (bool, error){
-	return true, nil
+func (pg *Postgres)IsLoginExist(login string) error{
+	query := `SELECT * FROM users WHERE login = $1`
+	s := ""
+	d := 0
+	if err := pg.Db.QueryRow(query, login).Scan(&d, &s); err != nil{
+		return err
+	}
+	return nil
 }

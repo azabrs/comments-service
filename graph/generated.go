@@ -46,22 +46,26 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	CreateStatus struct {
+		Result func(childComplexity int) int
+	}
+
 	Mutation struct {
-		Register func(childComplexity int, registerData model.RegisterData) int
+		CreatePost func(childComplexity int, identificationData model.IdentificationData, postData string, isCommentEnbale *bool) int
+		Register   func(childComplexity int, registerData model.RegisterData) int
 	}
 
 	Query struct {
 	}
 
 	RegisterStatus struct {
-		Description func(childComplexity int) int
-		Iserror     func(childComplexity int) int
-		Token       func(childComplexity int) int
+		Token func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	Register(ctx context.Context, registerData model.RegisterData) (*model.RegisterStatus, error)
+	CreatePost(ctx context.Context, identificationData model.IdentificationData, postData string, isCommentEnbale *bool) (*model.CreateStatus, error)
 }
 
 type executableSchema struct {
@@ -83,6 +87,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "CreateStatus.result":
+		if e.complexity.CreateStatus.Result == nil {
+			break
+		}
+
+		return e.complexity.CreateStatus.Result(childComplexity), true
+
+	case "Mutation.CreatePost":
+		if e.complexity.Mutation.CreatePost == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_CreatePost_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreatePost(childComplexity, args["IdentificationData"].(model.IdentificationData), args["PostData"].(string), args["IsCommentEnbale"].(*bool)), true
+
 	case "Mutation.Register":
 		if e.complexity.Mutation.Register == nil {
 			break
@@ -94,20 +117,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Register(childComplexity, args["RegisterData"].(model.RegisterData)), true
-
-	case "RegisterStatus.description":
-		if e.complexity.RegisterStatus.Description == nil {
-			break
-		}
-
-		return e.complexity.RegisterStatus.Description(childComplexity), true
-
-	case "RegisterStatus.iserror":
-		if e.complexity.RegisterStatus.Iserror == nil {
-			break
-		}
-
-		return e.complexity.RegisterStatus.Iserror(childComplexity), true
 
 	case "RegisterStatus.token":
 		if e.complexity.RegisterStatus.Token == nil {
@@ -124,6 +133,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputIdentificationData,
 		ec.unmarshalInputRegisterData,
 	)
 	first := true
@@ -241,6 +251,39 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_CreatePost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.IdentificationData
+	if tmp, ok := rawArgs["IdentificationData"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("IdentificationData"))
+		arg0, err = ec.unmarshalNIdentificationData2comments_serviceᚋgraphᚋmodelᚐIdentificationData(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["IdentificationData"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["PostData"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PostData"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["PostData"] = arg1
+	var arg2 *bool
+	if tmp, ok := rawArgs["IsCommentEnbale"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("IsCommentEnbale"))
+		arg2, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["IsCommentEnbale"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_Register_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -309,6 +352,47 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _CreateStatus_result(ctx context.Context, field graphql.CollectedField, obj *model.CreateStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateStatus_result(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Result, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateStatus_result(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_Register(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_Register(ctx, field)
 	if err != nil {
@@ -345,10 +429,6 @@ func (ec *executionContext) fieldContext_Mutation_Register(ctx context.Context, 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "iserror":
-				return ec.fieldContext_RegisterStatus_iserror(ctx, field)
-			case "description":
-				return ec.fieldContext_RegisterStatus_description(ctx, field)
 			case "token":
 				return ec.fieldContext_RegisterStatus_token(ctx, field)
 			}
@@ -363,6 +443,62 @@ func (ec *executionContext) fieldContext_Mutation_Register(ctx context.Context, 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_Register_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_CreatePost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_CreatePost(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["IdentificationData"].(model.IdentificationData), fc.Args["PostData"].(string), fc.Args["IsCommentEnbale"].(*bool))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreateStatus)
+	fc.Result = res
+	return ec.marshalOCreateStatus2ᚖcomments_serviceᚋgraphᚋmodelᚐCreateStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_CreatePost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "result":
+				return ec.fieldContext_CreateStatus_result(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateStatus", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_CreatePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -493,91 +629,6 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RegisterStatus_iserror(ctx context.Context, field graphql.CollectedField, obj *model.RegisterStatus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RegisterStatus_iserror(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Iserror, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RegisterStatus_iserror(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RegisterStatus",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RegisterStatus_description(ctx context.Context, field graphql.CollectedField, obj *model.RegisterStatus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RegisterStatus_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RegisterStatus_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RegisterStatus",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2397,6 +2448,40 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputIdentificationData(ctx context.Context, obj interface{}) (model.IdentificationData, error) {
+	var it model.IdentificationData
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"login", "token"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "login":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("login"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Login = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRegisterData(ctx context.Context, obj interface{}) (model.RegisterData, error) {
 	var it model.RegisterData
 	asMap := map[string]interface{}{}
@@ -2432,6 +2517,42 @@ func (ec *executionContext) unmarshalInputRegisterData(ctx context.Context, obj 
 
 // region    **************************** object.gotpl ****************************
 
+var createStatusImplementors = []string{"CreateStatus"}
+
+func (ec *executionContext) _CreateStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CreateStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateStatus")
+		case "result":
+			out.Values[i] = ec._CreateStatus_result(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2454,6 +2575,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "Register":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_Register(ctx, field)
+			})
+		case "CreatePost":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_CreatePost(ctx, field)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -2539,13 +2664,6 @@ func (ec *executionContext) _RegisterStatus(ctx context.Context, sel ast.Selecti
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RegisterStatus")
-		case "iserror":
-			out.Values[i] = ec._RegisterStatus_iserror(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "description":
-			out.Values[i] = ec._RegisterStatus_description(ctx, field, obj)
 		case "token":
 			out.Values[i] = ec._RegisterStatus_token(ctx, field, obj)
 		default:
@@ -2912,6 +3030,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNIdentificationData2comments_serviceᚋgraphᚋmodelᚐIdentificationData(ctx context.Context, v interface{}) (model.IdentificationData, error) {
+	res, err := ec.unmarshalInputIdentificationData(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNRegisterData2comments_serviceᚋgraphᚋmodelᚐRegisterData(ctx context.Context, v interface{}) (model.RegisterData, error) {
 	res, err := ec.unmarshalInputRegisterData(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3209,6 +3332,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOCreateStatus2ᚖcomments_serviceᚋgraphᚋmodelᚐCreateStatus(ctx context.Context, sel ast.SelectionSet, v *model.CreateStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CreateStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalORegisterStatus2ᚖcomments_serviceᚋgraphᚋmodelᚐRegisterStatus(ctx context.Context, sel ast.SelectionSet, v *model.RegisterStatus) graphql.Marshaler {

@@ -3,8 +3,8 @@ package main
 import (
 	"comments_service/config"
 	"comments_service/graph"
-	"comments_service/internal/authorization"
 	commentusecase "comments_service/internal/commentUseCase"
+	secure_access "comments_service/internal/secureAccess"
 	"comments_service/internal/storage/postgres"
 	"log"
 	"net/http"
@@ -28,7 +28,7 @@ func main() {
 	}
 	defer pg.Db.Close()
 	
-	authorization := authorization.NewAuthorization(conf.JWTKey)
+	authorization := secure_access.NewAuthorization(conf.JWTKey)
 	cuc := commentusecase.New(&pg, authorization)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : cuc}}))

@@ -6,13 +6,25 @@ input RegisterData {
   login: String!
 }
 
-
-type Mutation {
-  Register(RegisterData: RegisterData!): RegisterStatus
+input IdentificationData {
+  login: String!
+  token: String!
 }
 
+
+
+
+type Mutation {
+  Register(RegisterData: RegisterData!): RegisterStatus,
+  CreatePost(IdentificationData: IdentificationData!, PostData: String!, IsCommentEnbale: Boolean = TRUE) : CreateStatus
+}
+
+
+
 type RegisterStatus{
-    iserror: Boolean!
-    description: String
     token: String
+}
+
+type CreateStatus{
+  result: String
 }
