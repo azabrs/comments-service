@@ -3,6 +3,7 @@ package postgres
 import (
 	"comments_service/config"
 	custom_errors "comments_service/errors"
+	"comments_service/graph/model"
 	"comments_service/internal/models"
 	"database/sql"
 	"fmt"
@@ -51,4 +52,22 @@ func (pg *Postgres)IsLoginExist(login string) error{
 		return err
 	}
 	return nil
+}
+
+func (pg *Postgres)Posts() ([]*model.Post, error){
+	var res []*model.Post
+	query := `SELECT * FROM posts`
+	rows, err := pg.Db.Query(query)
+	if err != nil{
+		return nil, err
+	}
+	for rows.Next(){
+		var temp model.Post
+		err = rows.Scan(&temp.ID, &temp.Author, &temp.TimeAdd, &temp.IsCommentEnbale, &temp.Subject)
+		if err != nil{
+			return nil, err
+		}
+		res = append(res, &temp)
+	}
+	return res, nil
 }

@@ -2,7 +2,7 @@ package jwt
 
 import (
 	custom_errors "comments_service/errors"
-	//"time"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -16,7 +16,7 @@ func CreateToken(signingKey string, login string) (string, error){
 	claims := &Claims{
 		
 		RegisteredClaims: &jwt.RegisteredClaims{
-			ExpiresAt: nil,//jwt.NewNumericDate(time.Now().Add(time.Hour * 1000000)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 1000000)),
 		},
 		Login : login,
 	}

@@ -2,6 +2,10 @@
 
 package model
 
+type Comment struct {
+	Temp *string `json:"temp,omitempty"`
+}
+
 type CreateStatus struct {
 	Result *string `json:"result,omitempty"`
 }
@@ -12,6 +16,14 @@ type IdentificationData struct {
 }
 
 type Mutation struct {
+}
+
+type Post struct {
+	Author          *string `json:"author,omitempty"`
+	TimeAdd         *string `json:"timeAdd,omitempty"`
+	Subject         *string `json:"subject,omitempty"`
+	ID              *string `json:"ID,omitempty"`
+	IsCommentEnbale *bool   `json:"isCommentEnbale,omitempty"`
 }
 
 type Query struct {

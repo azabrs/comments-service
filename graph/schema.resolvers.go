@@ -7,6 +7,7 @@ package graph
 import (
 	"comments_service/graph/model"
 	"context"
+	"fmt"
 	"log"
 )
 
@@ -29,7 +30,30 @@ func (r *mutationResolver) CreatePost(ctx context.Context, identificationData mo
 	return &model.CreateStatus{Result: &resp}, nil
 }
 
+// AddComment is the resolver for the AddComment field.
+func (r *mutationResolver) AddComment(ctx context.Context, parentID *string, identificationData model.IdentificationData, commentData string, postID string) (*model.CreateStatus, error) {
+	panic(fmt.Errorf("not implemented: AddComment - AddComment"))
+}
+
+// Posts is the resolver for the Posts field.
+func (r *queryResolver) Posts(ctx context.Context, limit *int) ([]*model.Post, error) {
+	posts, err := r.Uc.Posts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+// PostAndComment is the resolver for the PostAndComment field.
+func (r *queryResolver) PostAndComment(ctx context.Context, limit *int) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: PostAndComment - PostAndComment"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
 type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

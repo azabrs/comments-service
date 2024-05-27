@@ -11,14 +11,28 @@ input IdentificationData {
   token: String!
 }
 
+type Post{
+  author: String
+  timeAdd: String
+  subject: String
+  ID: ID
+  isCommentEnbale: Boolean
+}
 
-
+type Comment{
+  temp: String
+}
 
 type Mutation {
   Register(RegisterData: RegisterData!): RegisterStatus,
-  CreatePost(IdentificationData: IdentificationData!, PostData: String!, IsCommentEnbale: Boolean = TRUE) : CreateStatus
+  CreatePost(IdentificationData: IdentificationData!, PostData: String!, IsCommentEnbale: Boolean = TRUE): CreateStatus
+  AddComment(ParentID: ID, IdentificationData:IdentificationData!, CommentData: String!, PostID: ID!) : CreateStatus
 }
 
+type Query {
+  Posts(limit: Int): [Post]
+  PostAndComment(limit: Int):[Comment]
+}
 
 
 type RegisterStatus{
