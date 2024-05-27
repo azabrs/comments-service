@@ -73,6 +73,8 @@ func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 	return res, nil
 }
 
+
+
 func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComment, occupiedSlot []int) error{
 	avaliable, err := pg.IsCommentable(&Comment.PostID)
 	if err != nil{
@@ -181,9 +183,29 @@ func (pg *Postgres)PostAndComment(postID *string, limit *int) (*model.PostWithCo
 		}
 		PWC.Comments = append(PWC.Comments, &temp)
 	}
+	res := make([]*model.RComment, 0)
+	for i := 0; i < len(PWC.Comments) ;i++{
+		if *PWC.Comments[i].ParentID == "0"{
+			res = pg.GetChild(PWC.Comments[i:], *PWC.Comments[i].CommentID, res)
+		} else{
+			break
+		}
+		
+	}
+	PWC.Comments = res
+	
 	return &PWC, nil
 }
 
+func(pg *Postgres) GetChild(posts []*model.RComment, id string, res []*model.RComment) []*model.RComment{
+	res = append(res, posts[0])
+	for i, val := range(posts){
+		if *val.ParentID == id && i != 0{
+			res = pg.GetChild(posts[i:], *val.CommentID, res)
+		}
+	}
+	return res
+}
 
 func (pg *Postgres) IsCommentable(postID *string,)(bool, error){
 	query := `SELECT * FROM posts WHERE id = $1`

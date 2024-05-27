@@ -8,6 +8,6 @@ Postgres:
   port: "5432"
 JWTKey: "secretkey"
 MaxSubs: 10
-TypeMemory: 1
+TypeMemory: 0
 MaxCommentSize: 2000
 
