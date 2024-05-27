@@ -35,7 +35,7 @@ func main() {
 	}
 	
 	authorization := secure_access.NewAuthorization(conf.JWTKey)
-	cuc := commentusecase.New(stor, authorization, conf.MaxSubs)
+	cuc := commentusecase.New(stor, authorization, conf.MaxSubs, conf.MaxCommentSize)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : &cuc}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
