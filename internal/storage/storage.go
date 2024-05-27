@@ -9,5 +9,5 @@ type Storage interface{
 	Register(string) error
 	CreatePost(models.Post) error
 	IsLoginExist(string) error
-	Posts() ([]*model.Post, error)
+	Posts(int) ([]*model.Post, error)
 }

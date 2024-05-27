@@ -54,10 +54,10 @@ func (pg *Postgres)IsLoginExist(login string) error{
 	return nil
 }
 
-func (pg *Postgres)Posts() ([]*model.Post, error){
+func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 	var res []*model.Post
-	query := `SELECT * FROM posts`
-	rows, err := pg.Db.Query(query)
+	query := `SELECT * FROM posts LIMIT $1`
+	rows, err := pg.Db.Query(query, limit)
 	if err != nil{
 		return nil, err
 	}

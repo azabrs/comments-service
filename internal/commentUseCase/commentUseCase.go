@@ -48,8 +48,8 @@ func (u UseCase) CreatePost(ctx context.Context, identificationData model.Identi
 	return nil
 }
 
-func (u UseCase) Posts(ctx context.Context) ([]*model.Post, error){
-	posts, err := u.stor.Posts()
+func (u UseCase) Posts(ctx context.Context, limit int) ([]*model.Post, error){
+	posts, err := u.stor.Posts(limit)
 	if err != nil{
 		return nil, err
 	}

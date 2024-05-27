@@ -37,7 +37,7 @@ func (r *mutationResolver) AddComment(ctx context.Context, parentID *string, ide
 
 // Posts is the resolver for the Posts field.
 func (r *queryResolver) Posts(ctx context.Context, limit *int) ([]*model.Post, error) {
-	posts, err := r.Uc.Posts(ctx)
+	posts, err := r.Uc.Posts(ctx, *limit)
 	if err != nil {
 		return nil, err
 	}
