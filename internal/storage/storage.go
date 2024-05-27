@@ -10,4 +10,7 @@ type Storage interface{
 	CreatePost(models.Post) error
 	IsLoginExist(string) error
 	Posts(int) ([]*model.Post, error)
+	AddComment(model.SComment) error
+	PostAndComment(postID *string, limit *int) (*model.PostWithComment, error)
+	IsCommentable(postID *string,)(bool, error)
 }

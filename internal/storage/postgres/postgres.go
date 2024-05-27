@@ -7,6 +7,7 @@ import (
 	"comments_service/internal/models"
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -70,4 +71,82 @@ func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 		res = append(res, &temp)
 	}
 	return res, nil
+}
+
+func (pg *Postgres)AddComment(Comment model.SComment) error{
+	avaliable, err := pg.IsCommentable(&Comment.PostID)
+	if err != nil{
+		return err
+	}
+	if !avaliable{
+		return custom_errors.ErrPostNotAvaliableToComment
+	}
+	query := `INSERT INTO comments(comment_data, parent_id, post_id, time_add, nesting_level) VALUES($1, $2, $3, $4, $5)`
+	if Comment.ParentID == nil{
+		CurTime := time.Now()
+		_, err := pg.Db.Exec(query, Comment.CommentData, 0, Comment.PostID, CurTime, 0)
+		if err != nil{
+			return err
+		}
+	}else{
+		queryS := `SELECT * FROM comments WHERE id = $1`
+		var t1, t2, t3, postID, t5 string
+		var nestingLevel int
+		if err := pg.Db.QueryRow(queryS, Comment.ParentID).Scan(&t1, &t2, &t3, &postID, &nestingLevel, &t5); err != nil{
+			return err
+		}
+		if postID != Comment.PostID{
+			return custom_errors.ErrPostIDIncorrect
+		}
+		_, err := pg.Db.Exec(query, Comment.CommentData, Comment.ParentID, Comment.PostID, time.Now(), nestingLevel + 1)
+		if err != nil{
+			return err
+		}
+	}
+	return nil
+}
+
+func (pg *Postgres)PostAndComment(postID *string, limit *int) (*model.PostWithComment, error){
+	
+	query := `SELECT * FROM posts WHERE id = $1`
+	var ID, Author, TimeAdd, Subject string
+	var IsCommentEnbale bool
+	if err := pg.Db.QueryRow(query, *postID).Scan(&ID, &Author, &TimeAdd, &IsCommentEnbale, &Subject); err != nil{
+		return nil, err
+	}
+	var PWC = model.PostWithComment{
+		ID: &ID,
+		Author: &Author,
+		TimeAdd: &TimeAdd,
+		IsCommentEnbale: &IsCommentEnbale,
+		Subject: &Subject,
+	}
+	if !*PWC.IsCommentEnbale{
+		return &PWC, nil
+	}
+	query = `SELECT * FROM comments WHERE post_id = $1`
+	rows, err := pg.Db.Query(query, *postID)
+	if err != nil{
+		return nil, err
+	}
+	for rows.Next(){
+		var temp model.RComment
+		err = rows.Scan(&temp.CommentID, &temp.CommentData, &temp.ParentID, &temp.PostID, &temp.NestingLevel, &temp.TimeAdd)
+		if err != nil{
+			return nil, err
+		}
+		PWC.Comments = append(PWC.Comments, &temp)
+	}
+	return &PWC, nil
+}
+
+
+func (pg *Postgres) IsCommentable(postID *string,)(bool, error){
+	query := `SELECT * FROM posts WHERE id = $1`
+	var ID, Author, TimeAdd,  Subject string
+	var IsCommentEnbale bool
+	if err := pg.Db.QueryRow(query, postID).Scan(&ID, &Author, &TimeAdd, &IsCommentEnbale, &Subject); err != nil{
+		return false, err
+	}
+	return IsCommentEnbale, nil
 }

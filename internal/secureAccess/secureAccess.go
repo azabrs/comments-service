@@ -2,6 +2,7 @@ package secure_access
 
 import (
 	custom_errors "comments_service/errors"
+	"comments_service/graph/model"
 	"comments_service/internal/storage"
 	jwt "comments_service/pkg/JWT"
 )
@@ -25,15 +26,15 @@ func (auth SecureAccess) Authorize(login string) (string, error){
 }
 
 
-func (auth SecureAccess) Authentication(login, token string, db storage.Storage) error {
-	loginFromToken, err := jwt.CheckUserToken(token, auth.JWTKey)
+func (auth SecureAccess) Authentication(IdentificationData model.IdentificationData, stor storage.Storage) error {
+	loginFromToken, err := jwt.CheckUserToken(IdentificationData.Token, auth.JWTKey)
 	if err != nil{
 		return err
 	}
-	if loginFromToken != login{
+	if loginFromToken != IdentificationData.Login{
 		return custom_errors.ErrTokenOrUserInvalid
 	}
-	if err := db.IsLoginExist(login); err != nil{
+	if err := stor.IsLoginExist(IdentificationData.Login); err != nil{
 		return err
 	}
 	return nil

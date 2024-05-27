@@ -18,20 +18,43 @@ type Post{
   ID: ID
   isCommentEnbale: Boolean
 }
+type PostWithComment{
+  author: String
+  timeAdd: String
+  subject: String
+  ID: ID
+  isCommentEnbale: Boolean
+  comments: [RComment]
+}
 
-type Comment{
-  temp: String
+input SComment{
+  CommentData: String!
+  ParentID: ID
+  PostID: ID!
+}
+
+type RComment{
+  CommentData: String
+  ParentID: ID
+  PostID: ID
+  CommentID: ID
+  NestingLevel: Int
+  timeAdd: String
 }
 
 type Mutation {
   Register(RegisterData: RegisterData!): RegisterStatus,
   CreatePost(IdentificationData: IdentificationData!, PostData: String!, IsCommentEnbale: Boolean = TRUE): CreateStatus
-  AddComment(ParentID: ID, IdentificationData:IdentificationData!, CommentData: String!, PostID: ID!) : CreateStatus
+  AddComment(IdentificationData:IdentificationData!, Comment: SComment!): CreateStatus
 }
 
 type Query {
   Posts(limit: Int): [Post]
-  PostAndComment(limit: Int):[Comment]
+  PostAndComment(PostID: ID, limit: Int): PostWithComment
+}
+
+type Subscription {
+  GetCommentsFromPost(IdentificationData: IdentificationData!, PostID: String!): RComment!
 }
 
 
