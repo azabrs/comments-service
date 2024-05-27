@@ -9,8 +9,8 @@ type Storage interface{
 	Register(string) error
 	CreatePost(models.Post) error
 	IsLoginExist(string) error
-	Posts(int) ([]*model.Post, error)
+	Posts(int, int) ([]*model.Post, error)
 	AddComment(model.SComment, []chan *model.RComment, []int) error
-	PostAndComment(postID *string, limit *int) (*model.PostWithComment, error)
-	IsCommentable(postID *string)(bool, error)
+	PostAndComment(*string, int, int) (*model.PostWithComment, error)
+	IsCommentable(*string)(bool, error)
 }

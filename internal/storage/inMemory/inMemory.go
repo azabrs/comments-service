@@ -69,7 +69,7 @@ func (im *inmemory)IsLoginExist(login string) error{
 }
 
 
-func (im *inmemory)Posts(limit int) ([]*model.Post, error){
+func (im *inmemory)Posts(limit int, offset int) ([]*model.Post, error){
 	im.m.RLock()
 	defer im.m.RUnlock()
 	var posts []*model.Post
@@ -167,7 +167,7 @@ func (im *inmemory)AddComment(Comment model.SComment, subCh []chan *model.RComme
 	return nil
 }
 
-func (im *inmemory)PostAndComment(postID *string, limit *int) (*model.PostWithComment, error){
+func (im *inmemory)PostAndComment(postID *string, limit int, offset int) (*model.PostWithComment, error){
 	im.m.RLock()
 	defer im.m.RUnlock()
 	ind, err := strconv.Atoi(*postID)

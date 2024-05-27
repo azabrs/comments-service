@@ -41,8 +41,8 @@ func (r *mutationResolver) AddComment(ctx context.Context, identificationData mo
 }
 
 // Posts is the resolver for the Posts field.
-func (r *queryResolver) Posts(ctx context.Context, limit *int) ([]*model.Post, error) {
-	posts, err := r.Uc.Posts(ctx, *limit)
+func (r *queryResolver) Posts(ctx context.Context, limit *int, offset *int) ([]*model.Post, error) {
+	posts, err := r.Uc.Posts(ctx, *limit, *offset)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -51,8 +51,8 @@ func (r *queryResolver) Posts(ctx context.Context, limit *int) ([]*model.Post, e
 }
 
 // PostAndComment is the resolver for the PostAndComment field.
-func (r *queryResolver) PostAndComment(ctx context.Context, postID *string, limit *int) (*model.PostWithComment, error) {
-	if PWC, err := r.Uc.PostAndComment(postID, limit); err != nil {
+func (r *queryResolver) PostAndComment(ctx context.Context, postID *string, limit *int, offset *int) (*model.PostWithComment, error) {
+	if PWC, err := r.Uc.PostAndComment(postID, *limit, *offset); err != nil {
 		log.Println(err)
 		return nil, err
 	} else {

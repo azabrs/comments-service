@@ -21,6 +21,7 @@ type Post{
 type PostWithComment{
   Post: Post
   comments: [RComment]
+  Count: Int
 }
 
 input SComment{
@@ -45,8 +46,8 @@ type Mutation {
 }
 
 type Query {
-  Posts(limit: Int): [Post]
-  PostAndComment(PostID: ID, limit: Int): PostWithComment
+  Posts(Limit: Int, Offset: Int): [Post]
+  PostAndComment(PostID: ID, Limit: Int, Offset: Int): PostWithComment
 }
 
 type Subscription {

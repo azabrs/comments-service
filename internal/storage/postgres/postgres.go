@@ -55,10 +55,10 @@ func (pg *Postgres)IsLoginExist(login string) error{
 	return nil
 }
 
-func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
+func (pg *Postgres)Posts(limit int, offset int) ([]*model.Post, error){
 	var res []*model.Post
-	query := `SELECT * FROM posts LIMIT $1`
-	rows, err := pg.Db.Query(query, limit)
+	query := `SELECT * FROM posts LIMIT $1 OFFSET $2`
+	rows, err := pg.Db.Query(query, limit, offset)
 	if err != nil{
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComme
 	return nil
 }
 
-func (pg *Postgres)PostAndComment(postID *string, limit *int) (*model.PostWithComment, error){
+func (pg *Postgres)PostAndComment(postID *string, limit int, offset int) (*model.PostWithComment, error){
 	
 	query := `SELECT * FROM posts WHERE id = $1`
 	var ID, Author, TimeAdd, Subject string
@@ -192,7 +192,7 @@ func (pg *Postgres)PostAndComment(postID *string, limit *int) (*model.PostWithCo
 		}
 		
 	}
-	PWC.Comments = res
+	PWC.Comments = res[offset:offset + limit]
 	
 	return &PWC, nil
 }

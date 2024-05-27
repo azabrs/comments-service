@@ -69,8 +69,8 @@ func (u *UseCase) CreatePost(ctx context.Context, identificationData model.Ident
 	return nil
 }
 
-func (u *UseCase) Posts(ctx context.Context, limit int) ([]*model.Post, error){
-	posts, err := u.stor.Posts(limit)
+func (u *UseCase) Posts(ctx context.Context, limit int, offset int) ([]*model.Post, error){
+	posts, err := u.stor.Posts(limit, offset)
 	if err != nil{
 		return nil, err
 	}
@@ -90,8 +90,8 @@ func (u *UseCase) AddComment(identificationData model.IdentificationData, commen
 	return nil
 }
 
-func (u *UseCase) PostAndComment(postID *string, limit *int) (*model.PostWithComment, error) {
-	PWC, err := u.stor.PostAndComment(postID, limit)
+func (u *UseCase) PostAndComment(postID *string, limit int, offset int) (*model.PostWithComment, error) {
+	PWC, err := u.stor.PostAndComment(postID, limit, offset)
 	if err != nil{
 		return nil, err
 	}

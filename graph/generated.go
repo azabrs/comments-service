@@ -69,12 +69,13 @@ type ComplexityRoot struct {
 
 	PostWithComment struct {
 		Comments func(childComplexity int) int
+		Count    func(childComplexity int) int
 		Post     func(childComplexity int) int
 	}
 
 	Query struct {
-		PostAndComment func(childComplexity int, postID *string, limit *int) int
-		Posts          func(childComplexity int, limit *int) int
+		PostAndComment func(childComplexity int, postID *string, limit *int, offset *int) int
+		Posts          func(childComplexity int, limit *int, offset *int) int
 	}
 
 	RComment struct {
@@ -101,8 +102,8 @@ type MutationResolver interface {
 	AddComment(ctx context.Context, identificationData model.IdentificationData, comment model.SComment) (*model.CreateStatus, error)
 }
 type QueryResolver interface {
-	Posts(ctx context.Context, limit *int) ([]*model.Post, error)
-	PostAndComment(ctx context.Context, postID *string, limit *int) (*model.PostWithComment, error)
+	Posts(ctx context.Context, limit *int, offset *int) ([]*model.Post, error)
+	PostAndComment(ctx context.Context, postID *string, limit *int, offset *int) (*model.PostWithComment, error)
 }
 type SubscriptionResolver interface {
 	GetCommentsFromPost(ctx context.Context, identificationData model.IdentificationData, postID string) (<-chan *model.RComment, error)
@@ -212,6 +213,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PostWithComment.Comments(childComplexity), true
 
+	case "PostWithComment.Count":
+		if e.complexity.PostWithComment.Count == nil {
+			break
+		}
+
+		return e.complexity.PostWithComment.Count(childComplexity), true
+
 	case "PostWithComment.Post":
 		if e.complexity.PostWithComment.Post == nil {
 			break
@@ -229,7 +237,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.PostAndComment(childComplexity, args["PostID"].(*string), args["limit"].(*int)), true
+		return e.complexity.Query.PostAndComment(childComplexity, args["PostID"].(*string), args["Limit"].(*int), args["Offset"].(*int)), true
 
 	case "Query.Posts":
 		if e.complexity.Query.Posts == nil {
@@ -241,7 +249,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Posts(childComplexity, args["limit"].(*int)), true
+		return e.complexity.Query.Posts(childComplexity, args["Limit"].(*int), args["Offset"].(*int)), true
 
 	case "RComment.CommentData":
 		if e.complexity.RComment.CommentData == nil {
@@ -533,14 +541,23 @@ func (ec *executionContext) field_Query_PostAndComment_args(ctx context.Context,
 	}
 	args["PostID"] = arg0
 	var arg1 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["Limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Limit"))
 		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["limit"] = arg1
+	args["Limit"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["Offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["Offset"] = arg2
 	return args, nil
 }
 
@@ -548,14 +565,23 @@ func (ec *executionContext) field_Query_Posts_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["Limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Limit"))
 		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["limit"] = arg0
+	args["Limit"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["Offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Offset"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["Offset"] = arg1
 	return args, nil
 }
 
@@ -1158,6 +1184,47 @@ func (ec *executionContext) fieldContext_PostWithComment_comments(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _PostWithComment_Count(ctx context.Context, field graphql.CollectedField, obj *model.PostWithComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PostWithComment_Count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PostWithComment_Count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PostWithComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_Posts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_Posts(ctx, field)
 	if err != nil {
@@ -1172,7 +1239,7 @@ func (ec *executionContext) _Query_Posts(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Posts(rctx, fc.Args["limit"].(*int))
+		return ec.resolvers.Query().Posts(rctx, fc.Args["Limit"].(*int), fc.Args["Offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1236,7 +1303,7 @@ func (ec *executionContext) _Query_PostAndComment(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().PostAndComment(rctx, fc.Args["PostID"].(*string), fc.Args["limit"].(*int))
+		return ec.resolvers.Query().PostAndComment(rctx, fc.Args["PostID"].(*string), fc.Args["Limit"].(*int), fc.Args["Offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1262,6 +1329,8 @@ func (ec *executionContext) fieldContext_Query_PostAndComment(ctx context.Contex
 				return ec.fieldContext_PostWithComment_Post(ctx, field)
 			case "comments":
 				return ec.fieldContext_PostWithComment_comments(ctx, field)
+			case "Count":
+				return ec.fieldContext_PostWithComment_Count(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PostWithComment", field.Name)
 		},
@@ -3811,6 +3880,8 @@ func (ec *executionContext) _PostWithComment(ctx context.Context, sel ast.Select
 			out.Values[i] = ec._PostWithComment_Post(ctx, field, obj)
 		case "comments":
 			out.Values[i] = ec._PostWithComment_comments(ctx, field, obj)
+		case "Count":
+			out.Values[i] = ec._PostWithComment_Count(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
