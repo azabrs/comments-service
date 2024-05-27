@@ -20,17 +20,17 @@ services:
     - psql-data:/var/lib/postgresql/
     networks:
       - postgres
-#  my-app:
-#    build:
-#      context: .
-#      dockerfile: DOCKERFILE
-#    ports:
-#      - '8080:8080'
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    networks:
-#      - postgres
+  my-app:
+    build:
+      context: .
+      dockerfile: DOCKERFILE
+    ports:
+      - '8080:8080'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - postgres
 
 
 networks:
