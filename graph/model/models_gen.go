@@ -25,6 +25,7 @@ type Post struct {
 type PostWithComment struct {
 	Post     *Post       `json:"Post,omitempty"`
 	Comments []*RComment `json:"comments,omitempty"`
+	Count	int
 }
 
 type Query struct {

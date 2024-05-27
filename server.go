@@ -5,6 +5,8 @@ import (
 	"comments_service/graph"
 	commentusecase "comments_service/internal/commentUseCase"
 	secure_access "comments_service/internal/secureAccess"
+	"comments_service/internal/storage"
+	inmemory "comments_service/internal/storage/inMemory"
 	"comments_service/internal/storage/postgres"
 	"log"
 	"net/http"
@@ -14,6 +16,7 @@ import (
 )
 
 func main() {
+	var stor storage.Storage
 	viperInst, err := config.LoadConfig()
 	if err != nil{
 		log.Fatal("Error in LoadConfig. Error:", err)
@@ -22,15 +25,17 @@ func main() {
 	if err != nil{
 		log.Fatal("Error in ParseConfig. Error:", err)
 	}
-	pg, err := postgres.InitDb(conf.Postgres)
-	if err != nil{
-		log.Fatal(err)
+	if conf.TypeMemory == 0{
+		stor, err = postgres.InitDb(conf.Postgres)
+		if err != nil{
+			log.Fatal(err)
+		}
+	} else if conf.TypeMemory == 1{
+		stor = inmemory.InitMemory()
 	}
-	defer pg.Db.Close()
 	
 	authorization := secure_access.NewAuthorization(conf.JWTKey)
-	cuc := commentusecase.New(&pg, authorization, conf.MaxSubs)
-
+	cuc := commentusecase.New(stor, authorization, conf.MaxSubs)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : &cuc}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

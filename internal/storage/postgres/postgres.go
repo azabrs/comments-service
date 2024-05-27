@@ -16,13 +16,13 @@ type Postgres struct{
 	Db *sql.DB
 }
 
-func InitDb(c config.PostgresConfig) (Postgres, error){
+func InitDb(c config.PostgresConfig) (*Postgres, error){
 	str := fmt.Sprintf("dbname=%s user=%s password=%s port=%s sslmode = disable", c.DbName, c.User, c.Password, c.Port)
 	db, err := sql.Open("postgres", str)
 	if err != nil{
-		return Postgres{},  fmt.Errorf("cant connect to db, %v", err)
+		return nil,  fmt.Errorf("cant connect to db, %v", err)
 	}
-	return Postgres{Db: db}, nil
+	return &Postgres{Db: db}, nil
 }
 
 func (pg *Postgres) Register(login string) error{

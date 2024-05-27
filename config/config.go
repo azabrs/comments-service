@@ -12,6 +12,7 @@ type Config struct{
 	Postgres PostgresConfig
 	JWTKey string
 	MaxSubs int
+	TypeMemory int
 }
 
 
