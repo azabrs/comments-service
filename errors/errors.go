@@ -9,4 +9,5 @@ var (
 	ErrPostNotAvaliableToComment = errors.New("the author has limited the possibility of commenting under this post")
 	ErrReachecMaxSub = errors.New("it is impossible to subscribe because the maximum possible number of subscriptions has been reached")
 	ErrParentIdIncorrect = errors.New("there is no comment with such an ParentID")
+	ErrReachedMaxLetterSize = errors.New("the message exceeds the maximum allowed size")
 )

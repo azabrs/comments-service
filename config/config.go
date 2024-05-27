@@ -13,6 +13,7 @@ type Config struct{
 	JWTKey string
 	MaxSubs int
 	TypeMemory int
+	MaxCommentSize int
 }
 
 

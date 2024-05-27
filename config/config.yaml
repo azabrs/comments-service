@@ -9,4 +9,5 @@ Postgres:
 JWTKey: "secretkey"
 MaxSubs: 10
 TypeMemory: 1
+MaxCommentSize: 2000
 

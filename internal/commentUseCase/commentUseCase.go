@@ -21,8 +21,9 @@ type UseCase struct{
 	occupiedSlot []int
 	maxSubscribers int
 	m sync.RWMutex
+	MaxCommentSize int
 }
-func New(stor storage.Storage, secure secure_access.SecureAccess, maxSubscribers int) UseCase{
+func New(stor storage.Storage, secure secure_access.SecureAccess, maxSubscribers int, MaxCommentSize int) UseCase{
 	var subCh []chan *model.RComment
 	var temp []int
 	for i := 0; i < maxSubscribers; i++{
@@ -79,6 +80,9 @@ func (u *UseCase) Posts(ctx context.Context, limit int) ([]*model.Post, error){
 func (u *UseCase) AddComment(identificationData model.IdentificationData, comment model.SComment) error{
 	if err := u.secure.Authentication(identificationData, u.stor); err != nil{
 		return err
+	}
+	if len([]rune(comment.CommentData)) > 2000{
+		return custom_errors.ErrReachedMaxLetterSize
 	}
 	if err := u.stor.AddComment(comment, u.subCh, u.occupiedSlot); err != nil{
 		return err
