@@ -17,20 +17,24 @@ type UseCase struct{
 	stor storage.Storage
 	secure secure_access.SecureAccess
 	subCh []chan *model.RComment
-	curretSubscribers int
+	freSlot []int
+	occupiedSlot []int
 	maxSubscribers int
 	m sync.RWMutex
 }
 func New(stor storage.Storage, secure secure_access.SecureAccess, maxSubscribers int) UseCase{
 	var subCh []chan *model.RComment
+	var temp []int
 	for i := 0; i < maxSubscribers; i++{
 		ch := make(chan *model.RComment)
 		subCh = append(subCh, ch)
+		temp = append(temp, i)
 	}
 	
 	return UseCase{stor : stor,
 						 secure : secure,
-						curretSubscribers: 0,
+						 occupiedSlot: make([]int, 0),
+						 freSlot: temp,
 					subCh: subCh,
 				maxSubscribers: maxSubscribers,}
 }
@@ -76,7 +80,7 @@ func (u *UseCase) AddComment(identificationData model.IdentificationData, commen
 	if err := u.secure.Authentication(identificationData, u.stor); err != nil{
 		return err
 	}
-	if err := u.stor.AddComment(comment, u.subCh); err != nil{
+	if err := u.stor.AddComment(comment, u.subCh, u.occupiedSlot); err != nil{
 		return err
 	}
 	return nil
@@ -94,18 +98,26 @@ func (u *UseCase) GetCommentsFromPost(ctx context.Context, identificationData mo
 	u.secure.Authentication(identificationData, u.stor)
 	u.m.Lock()
 	var chNumber int
-	if u.curretSubscribers >= u.maxSubscribers{
+	if len(u.freSlot) == 0{
 		return nil, custom_errors.ErrReachecMaxSub
 	}
-	chNumber = u.curretSubscribers
-	u.curretSubscribers += 1
-
-
+	for i, val := range(u.freSlot){
+		u.freSlot = append(u.freSlot[:i], u.freSlot[i+1:]...)
+		u.occupiedSlot = append(u.occupiedSlot, val)
+		break
+	}
+	chNumber = u.occupiedSlot[len(u.occupiedSlot) - 1]
 	u.m.Unlock()
 	go func() {
 		defer func(){
 			u.m.Lock()
-			u.curretSubscribers -= 1
+			for i, val := range(u.occupiedSlot){
+				if val == chNumber{
+					u.occupiedSlot = append(u.occupiedSlot[:i], u.occupiedSlot[i+1:]...)
+					u.freSlot = append(u.freSlot, val)
+					break
+				}
+			}
 			u.m.Unlock()
 		}()
 
@@ -121,7 +133,6 @@ func (u *UseCase) GetCommentsFromPost(ctx context.Context, identificationData mo
 				if *temp.PostID == postID{
 					ch <- temp
 				}
-				// Our message went through, do nothing
 			}
 
 		}

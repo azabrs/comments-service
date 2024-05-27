@@ -73,7 +73,7 @@ func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 	return res, nil
 }
 
-func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComment) error{
+func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComment, occupiedSlot []int) error{
 	avaliable, err := pg.IsCommentable(&Comment.PostID)
 	if err != nil{
 		return err
@@ -107,7 +107,7 @@ func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComme
 		tempLevel := nestingLevel + 1
 		var CommentID string
 		queryS2 := `SELECT id FROM comments WHERE time_add = $1`
-		if err := pg.Db.QueryRow(queryS2, TimeAdd).Scan(&CommentID); err != nil{
+		if err := pg.Db.QueryRow(queryS2, CurTime).Scan(&CommentID); err != nil{
 			return err
 		}
 
@@ -119,9 +119,11 @@ func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComme
 			TimeAdd: &TimeAdd,
 			CommentID: &CommentID,
 		}
-		for _, ch := range(subCh){
-			ch <- &buf
+		for _, val := range(occupiedSlot){
+			subCh[val] <- &buf
 		}
+		
+
 	}
 	return nil
 }
