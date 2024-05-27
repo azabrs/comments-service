@@ -83,7 +83,7 @@ func (im *inmemory)Posts(limit int, offset int) ([]*model.Post, error){
 			TimeAdd: val.Post.TimeAdd,
 		})
 	}
-	return posts, nil
+	return posts[limit:limit+offset], nil
 }
 
 func (im *inmemory)AddComment(Comment model.SComment, subCh []chan *model.RComment, occupiedSlot []int) error{
@@ -136,15 +136,6 @@ func (im *inmemory)AddComment(Comment model.SComment, subCh []chan *model.RComme
 		}  
 		nest_level := *p.Comments[ind2].NestingLevel + 1
 		temp_s2 := strconv.Itoa(im.Post[ind].Count)
-		/*im.Post[ind].Com[im.CommentID] = model.RComment{
-			CommentData: &Comment.CommentData,
-			ParentID: Comment.ParentID,
-			PostID: &Comment.PostID,
-			TimeAdd: &CurTime,
-			NestingLevel: p.NestingLevel,
-			CommentID: &temp_s2,
-			
-		}*/
 		im.Post[ind] = model.PostWithComment{
 			Post :im.Post[ind].Post,
 			Comments: append(im.Post[ind].Comments, &model.RComment{
@@ -174,12 +165,33 @@ func (im *inmemory)PostAndComment(postID *string, limit int, offset int) (*model
 	if err != nil{
 		return nil, err
 	}
-	res, ok := im.Post[ind]
+	PWC, ok := im.Post[ind]
 	if !ok{
 		return nil, custom_errors.ErrPostIDIncorrect
 	}
-	return &res, nil
+	res := make([]*model.RComment, 0)
+	for i := 0; i < len(PWC.Comments) ;i++{
+		if *PWC.Comments[i].ParentID == "0"{
+			res = im.GetChild(PWC.Comments[i:], *PWC.Comments[i].CommentID, res)
+		} else{
+			break
+		}
+		
+	}
+	PWC.Comments = res[offset:offset + limit]
 
+	return &PWC, nil
+
+}
+
+func(im *inmemory) GetChild(posts []*model.RComment, id string, res []*model.RComment) []*model.RComment{
+	res = append(res, posts[0])
+	for i, val := range(posts){
+		if *val.ParentID == id && i != 0{
+			res = im.GetChild(posts[i:], *val.CommentID, res)
+		}
+	}
+	return res
 }
 
 
