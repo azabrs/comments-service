@@ -29,9 +29,9 @@ func main() {
 	defer pg.Db.Close()
 	
 	authorization := secure_access.NewAuthorization(conf.JWTKey)
-	cuc := commentusecase.New(&pg, authorization)
+	cuc := commentusecase.New(&pg, authorization, conf.MaxSubs)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : cuc}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : &cuc}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

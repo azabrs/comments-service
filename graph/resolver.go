@@ -7,5 +7,5 @@ import commentusecase "comments_service/internal/commentUseCase"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct{
-	Uc commentusecase.UseCase
+	Uc *commentusecase.UseCase
 }

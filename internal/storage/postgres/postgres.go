@@ -73,7 +73,7 @@ func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 	return res, nil
 }
 
-func (pg *Postgres)AddComment(Comment model.SComment) error{
+func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComment) error{
 	avaliable, err := pg.IsCommentable(&Comment.PostID)
 	if err != nil{
 		return err
@@ -89,18 +89,38 @@ func (pg *Postgres)AddComment(Comment model.SComment) error{
 			return err
 		}
 	}else{
-		queryS := `SELECT * FROM comments WHERE id = $1`
-		var t1, t2, t3, postID, t5 string
+		queryS := `SELECT post_id, nesting_level FROM comments WHERE id = $1`
+		var postID string
 		var nestingLevel int
-		if err := pg.Db.QueryRow(queryS, Comment.ParentID).Scan(&t1, &t2, &t3, &postID, &nestingLevel, &t5); err != nil{
+		if err := pg.Db.QueryRow(queryS, Comment.ParentID).Scan(&postID, &nestingLevel); err != nil{
 			return err
 		}
 		if postID != Comment.PostID{
 			return custom_errors.ErrPostIDIncorrect
 		}
-		_, err := pg.Db.Exec(query, Comment.CommentData, Comment.ParentID, Comment.PostID, time.Now(), nestingLevel + 1)
+		CurTime := time.Now()
+		_, err := pg.Db.Exec(query, Comment.CommentData, Comment.ParentID, Comment.PostID, CurTime, nestingLevel + 1)
 		if err != nil{
 			return err
+		}
+		TimeAdd := CurTime.String()
+		tempLevel := nestingLevel + 1
+		var CommentID string
+		queryS2 := `SELECT id FROM comments WHERE time_add = $1`
+		if err := pg.Db.QueryRow(queryS2, TimeAdd).Scan(&CommentID); err != nil{
+			return err
+		}
+
+		buf := model.RComment{
+			CommentData: &Comment.CommentData,
+			ParentID: Comment.ParentID,
+			PostID: &Comment.PostID,
+			NestingLevel: &tempLevel,
+			TimeAdd: &TimeAdd,
+			CommentID: &CommentID,
+		}
+		for _, ch := range(subCh){
+			ch <- &buf
 		}
 	}
 	return nil
