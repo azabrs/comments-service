@@ -16,14 +16,10 @@ type Post{
   timeAdd: String
   subject: String
   ID: ID
-  isCommentEnbale: Boolean
+  isCommentEnable: Boolean
 }
 type PostWithComment{
-  author: String
-  timeAdd: String
-  subject: String
-  ID: ID
-  isCommentEnbale: Boolean
+  Post: Post
   comments: [RComment]
 }
 

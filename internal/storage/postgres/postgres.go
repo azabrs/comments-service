@@ -64,7 +64,7 @@ func (pg *Postgres)Posts(limit int) ([]*model.Post, error){
 	}
 	for rows.Next(){
 		var temp model.Post
-		err = rows.Scan(&temp.ID, &temp.Author, &temp.TimeAdd, &temp.IsCommentEnbale, &temp.Subject)
+		err = rows.Scan(&temp.ID, &temp.Author, &temp.TimeAdd, &temp.IsCommentEnable, &temp.Subject)
 		if err != nil{
 			return nil, err
 		}
@@ -87,6 +87,26 @@ func (pg *Postgres)AddComment(Comment model.SComment, subCh []chan *model.RComme
 		_, err := pg.Db.Exec(query, Comment.CommentData, 0, Comment.PostID, CurTime, 0)
 		if err != nil{
 			return err
+		}
+
+		TimeAdd := CurTime.String()
+		var CommentID string
+		queryS2 := `SELECT id FROM comments WHERE time_add = $1`
+		if err := pg.Db.QueryRow(queryS2, CurTime).Scan(&CommentID); err != nil{
+			return err
+		}
+		var temp = 0
+		var temps = ""
+		buf := model.RComment{
+			CommentData: &Comment.CommentData,
+			ParentID: &temps,
+			PostID: &Comment.PostID,
+			NestingLevel: &temp,
+			TimeAdd: &TimeAdd,
+			CommentID: &CommentID,
+		}
+		for _, val := range(occupiedSlot){
+			subCh[val] <- &buf
 		}
 	}else{
 		queryS := `SELECT post_id, nesting_level FROM comments WHERE id = $1`
@@ -137,13 +157,15 @@ func (pg *Postgres)PostAndComment(postID *string, limit *int) (*model.PostWithCo
 		return nil, err
 	}
 	var PWC = model.PostWithComment{
+	Post : &model.Post{
 		ID: &ID,
 		Author: &Author,
 		TimeAdd: &TimeAdd,
-		IsCommentEnbale: &IsCommentEnbale,
+		IsCommentEnable: &IsCommentEnbale,
 		Subject: &Subject,
+		},
 	}
-	if !*PWC.IsCommentEnbale{
+	if !*PWC.Post.IsCommentEnable{
 		return &PWC, nil
 	}
 	query = `SELECT * FROM comments WHERE post_id = $1`

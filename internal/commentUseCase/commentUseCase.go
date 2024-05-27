@@ -97,6 +97,7 @@ func (u *UseCase) GetCommentsFromPost(ctx context.Context, identificationData mo
 	ch := make(chan *model.RComment)
 	u.secure.Authentication(identificationData, u.stor)
 	u.m.Lock()
+	defer u.m.Unlock()
 	var chNumber int
 	if len(u.freSlot) == 0{
 		return nil, custom_errors.ErrReachecMaxSub
@@ -107,10 +108,10 @@ func (u *UseCase) GetCommentsFromPost(ctx context.Context, identificationData mo
 		break
 	}
 	chNumber = u.occupiedSlot[len(u.occupiedSlot) - 1]
-	u.m.Unlock()
 	go func() {
 		defer func(){
 			u.m.Lock()
+			defer u.m.Unlock()
 			for i, val := range(u.occupiedSlot){
 				if val == chNumber{
 					u.occupiedSlot = append(u.occupiedSlot[:i], u.occupiedSlot[i+1:]...)
@@ -118,7 +119,7 @@ func (u *UseCase) GetCommentsFromPost(ctx context.Context, identificationData mo
 					break
 				}
 			}
-			u.m.Unlock()
+			
 		}()
 
 		for {

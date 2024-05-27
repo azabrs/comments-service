@@ -19,16 +19,12 @@ type Post struct {
 	TimeAdd         *string `json:"timeAdd,omitempty"`
 	Subject         *string `json:"subject,omitempty"`
 	ID              *string `json:"ID,omitempty"`
-	IsCommentEnbale *bool   `json:"isCommentEnbale,omitempty"`
+	IsCommentEnable *bool   `json:"isCommentEnable,omitempty"`
 }
 
 type PostWithComment struct {
-	Author          *string     `json:"author,omitempty"`
-	TimeAdd         *string     `json:"timeAdd,omitempty"`
-	Subject         *string     `json:"subject,omitempty"`
-	ID              *string     `json:"ID,omitempty"`
-	IsCommentEnbale *bool       `json:"isCommentEnbale,omitempty"`
-	Comments        []*RComment `json:"comments,omitempty"`
+	Post     *Post       `json:"Post,omitempty"`
+	Comments []*RComment `json:"comments,omitempty"`
 }
 
 type Query struct {
