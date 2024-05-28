@@ -15,6 +15,7 @@ docker compose up -d
 
 # Возможные команды
 ## Регистрация 
+### Пример обращения
 ```
 mutation{
   Register(RegisterData:{
@@ -24,19 +25,41 @@ mutation{
   }
 }
 ```
+### Пример ответа
+```
+{
+  "data": {
+    "Register": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4ODU5MzgsIkxvZ2luIjoic2FzaGEifQ.2g2t91z9Traoe2RK8_8Qb6MU4tJzW14Nlb7ZpDESmwQ"
+    }
+  }
+}
+```
 ## Создание поста
+### Пример обращения
 ```
 mutation{
   CreatePost(IdentificationData:{
     login: "sasha"
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4ODQ4NTcsIkxvZ2luIjoic2FzaGEifQ.WY1nkz1YdEt7I92RwOxYxxLDR_wW5ng2iM1N4Wk-lvs"  }
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4ODU5MzgsIkxvZ2luIjoic2FzaGEifQ.2g2t91z9Traoe2RK8_8Qb6MU4tJzW14Nlb7ZpDESmwQ"  }
     PostData:"POSTEREL"
-    IsCommentEnbale: false){
+    IsCommentEnbale: true){
       result
   }
 }
 ```
+### Пример ответа
+```
+{
+  "data": {
+    "CreatePost": {
+      "result": "Successfully published"
+    }
+  }
+}
+```
 ## Получение списка постов
+### Пример обращения
 ```
 query{
   Posts(Limit: 3, Offset: 0){
@@ -49,7 +72,38 @@ query{
   }
 }
 ```
+### Пример ответа
+```
+{
+  "data": {
+    "Posts": [
+      {
+        "ID": "1",
+        "subject": "POSTEREL",
+        "author": "sasha",
+        "timeAdd": "2024-05-28T08:47:15.173342Z",
+        "isCommentEnable": false
+      },
+      {
+        "ID": "2",
+        "subject": "POSTEREL",
+        "author": "sasha",
+        "timeAdd": "2024-05-28T08:47:15.78089Z",
+        "isCommentEnable": false
+      },
+      {
+        "ID": "3",
+        "subject": "POSTEREL",
+        "author": "sasha",
+        "timeAdd": "2024-05-28T08:47:16.248519Z",
+        "isCommentEnable": false
+      }
+    ]
+  }
+}
+```
 ## Добавление комментариев
+### Пример обращения
 ```
 mutation{
   AddComment(IdentificationData:{
@@ -57,16 +111,27 @@ mutation{
     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4MDA5NjAsIkxvZ2luIjoic2FzaGEifQ.J-NPh1rt0sakjTvdkccOzX56HHLIFhpqAiEys746QYU"  }
   Comment:{
     CommentData: "blabla1"
-    PostID: "2"
+    PostID: "12"
   }), {
       result
   }
 }
 ```
+### Пример ответа
+```
+{
+  "data": {
+    "AddComment": {
+      "result": "Successfully published"
+    }
+  }
+}
+```
 ## Получение комментариев к посту
+### Пример обращения
 ```
 query{
-  PostAndComment(PostID: 2,limit: 3){
+  PostAndComment(PostID: 2,Limit: 3, Offset: 0){
     Post{
     ID
     subject
@@ -85,9 +150,24 @@ query{
   }
 }
 ```
-
+### Пример ответа
+{
+  "data": {
+    "PostAndComment": {
+      "Post": {
+        "ID": "2",
+        "subject": "POSTEREL",
+        "author": "sasha",
+        "timeAdd": "2024-05-28T08:47:15.78089Z",
+        "isCommentEnable": false
+      },
+      "comments": null
+    }
+  }
+}
 
 ## Подписка на пост
+### Пример обращения
 ```
 subscription{
   GetCommentsFromPost(IdentificationData:{
@@ -97,6 +177,17 @@ subscription{
   ), {
       CommentID
       CommentData
+  }
+}
+```
+### Пример ответа
+```
+{
+  "data": {
+    "GetCommentsFromPost": {
+      "CommentID": "6",
+      "CommentData": "blabla1"
+    }
   }
 }
 ```
