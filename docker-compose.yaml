@@ -1,13 +1,10 @@
 version: '3.8'
 services:
-  db:
-    container_name: composepostgres
+  postgres:
     image: postgres:14
-    restart: always
-    hostname: postgres
+    container_name: postgres-service
     environment:
       POSTGRES_DB: 'commentsdb'
-      POSTGRES_HOST: 'postgres'
       POSTGRES_USER: 'apuha'
       POSTGRES_PASSWORD: '12345678'
     ports:
@@ -20,21 +17,15 @@ services:
     volumes:
     - ./scripts:/docker-entrypoint-initdb.d
     - psql-data:/var/lib/postgresql/
-    networks:
-      - postgres
   my-app:
-    container_name: comments_service
     build:
       context: .
       dockerfile: DOCKERFILE
-    hostname: postgres
     ports:
       - '8080:8080'
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    networks:
-      - postgres
 
 
 networks:

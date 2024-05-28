@@ -1,14 +1,12 @@
 Server:
-  Host: "postgres"
+  Host: "0.0.0.0"
   Port: "8080"
 Postgres:
   dbName: "commentsdb"
   user: "apuha"
   password: "12345678"
-  host: "postgres"
   port: "5432"
 JWTKey: "secretkey"
 MaxSubs: 10
 TypeMemory: 0
 MaxCommentSize: 2000
-
