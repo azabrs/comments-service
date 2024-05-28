@@ -22,4 +22,81 @@ mutation{
   }){
       token
   }
-}```
+}
+```
+## Создание поста
+```
+mutation{
+  CreatePost(IdentificationData:{
+    login: "sasha"
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4ODQ4NTcsIkxvZ2luIjoic2FzaGEifQ.WY1nkz1YdEt7I92RwOxYxxLDR_wW5ng2iM1N4Wk-lvs"  }
+    PostData:"POSTEREL"
+    IsCommentEnbale: false){
+      result
+  }
+}
+```
+## Получение списка постов
+```
+query{
+  Posts(Limit: 3, Offset: 0){
+    ID
+    subject
+    author
+    timeAdd
+    isCommentEnable
+    
+  }
+}
+```
+## Добавление комментариев
+```
+mutation{
+  AddComment(IdentificationData:{
+    login: "sasha"
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4MDA5NjAsIkxvZ2luIjoic2FzaGEifQ.J-NPh1rt0sakjTvdkccOzX56HHLIFhpqAiEys746QYU"  }
+  Comment:{
+    CommentData: "blabla1"
+    PostID: "2"
+  }), {
+      result
+  }
+}
+```
+## Получение комментариев к посту
+```
+query{
+  PostAndComment(PostID: 2,limit: 3){
+    Post{
+    ID
+    subject
+    author
+    timeAdd
+    isCommentEnable 
+    }
+
+    comments{
+      CommentData
+      ParentID
+      PostID
+      CommentID
+      NestingLevel
+    }
+  }
+}
+```
+
+
+## Подписка на пост
+```
+subscription{
+  GetCommentsFromPost(IdentificationData:{
+    login: "sasha"
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjUzMTY4MDA5NjAsIkxvZ2luIjoic2FzaGEifQ.J-NPh1rt0sakjTvdkccOzX56HHLIFhpqAiEys746QYU"  }
+    PostID: "2"
+  ), {
+      CommentID
+      CommentData
+  }
+}
+```
