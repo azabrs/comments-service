@@ -15,11 +15,11 @@ docker compose up -d
 
 # Возможные команды
 ## Регистрация 
-```go code```
-`mutation{
+```
+mutation{
   Register(RegisterData:{
     login: "sasha"
   }){
       token
   }
-}`
+}```
