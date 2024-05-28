@@ -83,7 +83,17 @@ func (im *inmemory)Posts(limit int, offset int) ([]*model.Post, error){
 			TimeAdd: val.Post.TimeAdd,
 		})
 	}
-	return posts[limit:limit+offset], nil
+	var res []*model.Post 
+	var empty []*model.Post 
+	if offset > len(posts){
+		res = empty
+	}else if offset + limit > len(posts){
+		res = posts[offset:]
+	} else{
+		res = posts[offset:offset + limit]
+	}
+
+	return res, nil
 }
 
 func (im *inmemory)AddComment(Comment model.SComment, subCh []chan *model.RComment, occupiedSlot []int) error{
@@ -170,6 +180,7 @@ func (im *inmemory)PostAndComment(postID *string, limit int, offset int) (*model
 		return nil, custom_errors.ErrPostIDIncorrect
 	}
 	res := make([]*model.RComment, 0)
+	empty := make([]*model.RComment, 0)
 	for i := 0; i < len(PWC.Comments) ;i++{
 		if *PWC.Comments[i].ParentID == "0"{
 			res = im.GetChild(PWC.Comments[i:], *PWC.Comments[i].CommentID, res)
@@ -178,7 +189,13 @@ func (im *inmemory)PostAndComment(postID *string, limit int, offset int) (*model
 		}
 		
 	}
-	PWC.Comments = res[offset:offset + limit]
+	if offset > len(res){
+		PWC.Comments = empty
+	}else if offset + limit > len(res){
+		PWC.Comments = res[offset:]
+	} else{
+		PWC.Comments = res[offset:offset + limit]
+	}
 
 	return &PWC, nil
 

@@ -189,6 +189,7 @@ func (pg *Postgres)PostAndComment(postID *string, limit int, offset int) (*model
 		PWC.Comments = append(PWC.Comments, &temp)
 	}
 	res := make([]*model.RComment, 0)
+	empty := make([]*model.RComment, 0)
 	for i := 0; i < len(PWC.Comments) ;i++{
 		if *PWC.Comments[i].ParentID == "0"{
 			res = pg.GetChild(PWC.Comments[i:], *PWC.Comments[i].CommentID, res)
@@ -197,7 +198,14 @@ func (pg *Postgres)PostAndComment(postID *string, limit int, offset int) (*model
 		}
 		
 	}
-	PWC.Comments = res[offset:offset + limit]
+	if offset > len(res){
+		PWC.Comments = empty
+	}else if offset + limit > len(res){
+		PWC.Comments = res[offset:]
+	} else{
+		PWC.Comments = res[offset:offset + limit]
+	}
+	
 	
 	return &PWC, nil
 }
