@@ -17,7 +17,7 @@ type Postgres struct{
 }
 
 func InitDb(c config.PostgresConfig) (*Postgres, error){
-	str := fmt.Sprintf("dbname=%s user=%s password=%s port=%s sslmode = disable", c.DbName, c.User, c.Password, c.Port)
+	str := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.DbName)
 	db, err := sql.Open("postgres", str)
 	if err != nil{
 		return nil,  fmt.Errorf("cant connect to db, %v", err)

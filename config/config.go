@@ -27,6 +27,7 @@ type PostgresConfig struct{
 	User string `yaml:"user"`
 	Password string `yaml:"password"`
 	Port string `yaml:"port"`
+	Host string `yaml:"host"`
 }
 
 func LoadConfig() (*viper.Viper, error) {
