@@ -20,7 +20,7 @@ type UseCase struct{
 	freSlot []int
 	occupiedSlot []int
 	maxSubscribers int
-	m sync.RWMutex
+	m *sync.RWMutex
 	MaxCommentSize int
 }
 func New(stor storage.Storage, secure secure_access.SecureAccess, maxSubscribers int, MaxCommentSize int) UseCase{
