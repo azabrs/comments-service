@@ -4,7 +4,7 @@ import (
 	"comments_service/graph/model"
 	"comments_service/internal/models"
 )
-
+//go:generate go run github.com/vektra/mockery/v2@v2.43.2 --name=Storage
 type Storage interface{
 	Register(string) error
 	CreatePost(models.Post) error

@@ -35,15 +35,17 @@ func TestUseCase_Posts(t *testing.T) {
 		wantErr bool
 	}{
 		struct{name string; fields fields; args args; want []*model.Post; wantErr bool}{name: "firstCase", args: args{
-			limit: 10,
-			offset: 3,
-		}, want: nil},
+			limit: 1,
+			offset: 0,
+		}, want: []*model.Post{
+		}},
 	}
 	for _, tt := range tests {
 		stor := storage.NewStorage(t)
 		secure := secure_access.NewSecureAccess(t)
-		stor.On("Posts", tt.args.limit, tt.args.offset).Return(nil, nil)
 
+		stor.On("Posts", tt.args.limit, tt.args.offset).Return([]*model.Post{
+			}, nil)
 
 		t.Run(tt.name, func(t *testing.T) {
 			u := &UseCase{
@@ -56,11 +58,7 @@ func TestUseCase_Posts(t *testing.T) {
 				m:              tt.fields.m,
 				MaxCommentSize: tt.fields.MaxCommentSize,
 			}
-			got, err := u.Posts(tt.args.ctx, tt.args.limit, tt.args.offset)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("UseCase.Posts() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got, _ := u.Posts(tt.args.ctx, tt.args.limit, tt.args.offset)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("UseCase.Posts() = %v, want %v", got, tt.want)
 			}

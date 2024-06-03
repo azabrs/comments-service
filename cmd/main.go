@@ -4,7 +4,7 @@ import (
 	"comments_service/config"
 	"comments_service/graph"
 	commentusecase "comments_service/internal/commentUseCase"
-	secure_access "comments_service/internal/secureAccess"
+	secure_access_comment "comments_service/internal/secureAccess/secureAccessComment"
 	"comments_service/internal/storage"
 	inmemory "comments_service/internal/storage/inMemory"
 	"comments_service/internal/storage/postgres"
@@ -33,8 +33,7 @@ func main() {
 	} else if conf.TypeMemory == 1{
 		stor = inmemory.InitMemory()
 	}
-	
-	authorization := secure_access.NewAuthorization(conf.JWTKey)
+	authorization := secure_access_comment.NewAuthorization(conf.JWTKey)
 	cuc := commentusecase.New(stor, authorization, conf.MaxSubs, conf.MaxCommentSize)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Uc : &cuc}}))
 
