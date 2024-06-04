@@ -1,0 +1,11 @@
+mode: set
+comments_service/pkg/JWT/jwt.go:15.66,25.15 4 1
+comments_service/pkg/JWT/jwt.go:25.15,27.3 1 0
+comments_service/pkg/JWT/jwt.go:28.2,28.16 1 1
+comments_service/pkg/JWT/jwt.go:31.76,33.104 1 1
+comments_service/pkg/JWT/jwt.go:33.104,35.3 1 1
+comments_service/pkg/JWT/jwt.go:37.2,37.15 1 1
+comments_service/pkg/JWT/jwt.go:37.15,39.3 1 1
+comments_service/pkg/JWT/jwt.go:39.8,39.74 1 1
+comments_service/pkg/JWT/jwt.go:39.74,41.3 1 1
+comments_service/pkg/JWT/jwt.go:41.8,43.3 1 1

@@ -3,7 +3,7 @@ package jwt
 import (
 	custom_errors "comments_service/errors"
 	"time"
-
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -29,16 +29,16 @@ func CreateToken(signingKey string, login string) (string, error){
 }
 
 func CheckUserToken(tokenString string, signingKey string) (string, error) {
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+	//claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(signingKey), nil
 	})
 
 	if err != nil{
-		return "", err
-	}
-	if !token.Valid{
 		return "", custom_errors.ErrTokenOrUserInvalid
+	} else if claims, ok := token.Claims.(*Claims); ok && claims.Login != ""{
+		return claims.Login, nil
+	} else {
+		return "", fmt.Errorf("unknown claims type, cannot proceed")
 	}
-	return claims.Login, nil
 }
